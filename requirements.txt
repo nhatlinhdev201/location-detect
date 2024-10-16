@@ -1,5 +1,6 @@
 Flask
 pandas
 unidecode
+flask
 
 #pip install -r requirements.txt
