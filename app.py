@@ -17,7 +17,7 @@ app.add_middleware(
 # Đăng ký router
 app.include_router(api_router, prefix="/api")
 
-@app.get('/')
+@app.get('/api')
 async def root():
     return {"message": "Hello World"}
 
