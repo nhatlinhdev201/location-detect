@@ -1,6 +1,6 @@
-from flask import Blueprint
+# from fastapi import APIRouter
 
-api_blueprint = Blueprint('api', __name__)
+# api_router = APIRouter()
 
-from .search import * 
-from .other import *   
+# # from .search import *
+# # from .other import *

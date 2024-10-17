@@ -7,12 +7,27 @@ def preprocess_input(user_input):
     return user_input
 
 def calculate_score(user_input, keys):
-    """Tính điểm cho mỗi địa chỉ dựa trên input và keys."""
-    score = 0
-    for key in keys:
-        if key in user_input:
-            score += 1
-            user_input = user_input.replace(key, '')  # Xóa key khỏi input
+    """Tính điểm cho mỗi địa chỉ dựa trên input và keys, phân loại theo loại địa chỉ."""
+    score = {
+        'ward': 0,
+        'district': 0,
+        'city': 0
+    }
+
+    # Kiểm tra từng key và cộng điểm cho loại tương ứng
+    if len(keys) >= 3:  # Đảm bảo có đủ 3 phần
+        if keys[0] in user_input:
+            score['ward'] += 1
+            user_input = user_input.replace(keys[0], '')
+
+        if keys[1] in user_input:
+            score['district'] += 1
+            user_input = user_input.replace(keys[1], '')
+
+        if keys[2] in user_input:
+            score['city'] += 1
+            user_input = user_input.replace(keys[2], '')
+
     return score
 
 def find_best_matches(user_input, data):
@@ -21,7 +36,9 @@ def find_best_matches(user_input, data):
 
     for entry in data:
         score = calculate_score(user_input, entry['keys'])
-        if score > 0:
+        total_score = sum(score.values())  
+
+        if total_score > 0:
             results.append({
                 'city': entry['city'],
                 'city_id': entry['city_id'],
@@ -29,9 +46,12 @@ def find_best_matches(user_input, data):
                 'district_id': entry['district_id'],
                 'ward': entry['ward'],
                 'ward_id': entry['ward_id'],
-                'score': score
+                'score': total_score,
+                'ward_score': score['ward'],
+                'district_score': score['district'],
+                'city_score': score['city']
             })
 
-    # Sắp xếp kết quả theo điểm
+    # Sắp xếp kết quả theo điểm tổng
     results.sort(key=lambda x: x['score'], reverse=True)
-    return results[:5] 
+    return results[:5]

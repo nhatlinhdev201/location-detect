@@ -1,3 +1,7 @@
+uvicorn app:app --reload
+
+
+
 Bước 1: Tạo Tài Khoản AWS
 Truy cập AWS và tạo một tài khoản nếu bạn chưa có.
 Bước 2: Cài Đặt AWS CLI và EB CLI

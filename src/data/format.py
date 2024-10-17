@@ -1,9 +1,9 @@
 import pandas as pd
 import json
-from src.utils.format_data_utils import format_address, nomalize_vn
+from format_data_utils import format_address, nomalize_vn
 
 # Đọc dữ liệu Excel
-file_path = 'data.xlsx'  # Đảm bảo đường dẫn đúng đến file Excel
+file_path = 'data.xlsx'  
 df = pd.read_excel(file_path)
 
 # Đổi tên cột
@@ -30,7 +30,7 @@ df['district_nomal'] = df['district'].apply(lambda x: nomalize_vn(x))
 df['ward_nomal'] = df['ward'].apply(lambda x: nomalize_vn(x))
 df['city_nomal'] = df['city'].apply(lambda x: nomalize_vn(x))
 
-df['keys'] = df.apply(lambda row: [row['city_nomal'], row['district_nomal'], row['ward_nomal']], axis=1)
+df['keys'] = df.apply(lambda row: [row['ward_nomal'], row['district_nomal'], row['city_nomal']], axis=1)
 
 # Xuất dữ liệu
 columns_out = ['city', 'city_id', 'district', 'district_id', 'ward', 'ward_id', 'keys']
