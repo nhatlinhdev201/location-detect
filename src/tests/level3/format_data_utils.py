@@ -20,22 +20,22 @@ def remove_accents(text):
     return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 def format_address(address):
-    # buoc 1 : chuyen het ve khong dau viet thuong
+    # Bước 1: Chuyển chuỗi về dạng chữ thường và không dấu
     address = address.lower()
     address = remove_accents(address)
 
-    # buoc 2 : thay the các kieu ky tu dac biet
+    # Bước 2: Thay thế các ký tự đặc biệt cụ thể bằng khoảng trắng
     special_chars = ['#', '!', ',', '.', '-']
     for char in special_chars:
         address = address.replace(char, ' ')
 
-     # buoc 3 : thay the tung kieu ky tu
+     # Bước 3: Thay thế các từ khóa
     for replacement in replacements:
         key = replacement['key']
         value = replacement['value']
         address = address.replace(key, value)
     
-    # buoc 4 : bo cac khoang trang thua
+    # Bước 4: Bỏ đi các khoảng trắng thừa
     address = re.sub(r'\s+', ' ', address).strip()
     
     return address

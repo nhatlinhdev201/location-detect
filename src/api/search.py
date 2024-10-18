@@ -7,7 +7,7 @@ from src.utils import format_address
 router = APIRouter()
 
 # Đọc dữ liệu từ file JSON
-with open('src/data/DataLocation.json', 'r', encoding='utf-8') as json_file:
+with open('src/data/json_data_location_level3.json', 'r', encoding='utf-8') as json_file:
     data = json.load(json_file)
 
 class SearchRequest(BaseModel):
