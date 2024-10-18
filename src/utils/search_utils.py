@@ -7,6 +7,8 @@ def preprocess_input(user_input):
     return user_input
 
 def calculate_score(user_input, keys):
+
+    input = preprocess_input(user_input)
     """Tính điểm cho mỗi địa chỉ dựa trên input và keys, phân loại theo loại địa chỉ."""
     score = {
         'ward': 0,
@@ -16,17 +18,17 @@ def calculate_score(user_input, keys):
 
     # Kiểm tra từng key và cộng điểm cho loại tương ứng
     if len(keys) >= 3:  # Đảm bảo có đủ 3 phần
-        if keys[0] in user_input:
+        if keys[0] in input:
             score['ward'] += 1
-            user_input = user_input.replace(keys[0], '')
+            input = input.replace(keys[0], '')
 
-        if keys[1] in user_input:
+        if keys[1] in input:
             score['district'] += 1
-            user_input = user_input.replace(keys[1], '')
+            input = input.replace(keys[1], '')
 
-        if keys[2] in user_input:
+        if keys[2] in input:
             score['city'] += 1
-            user_input = user_input.replace(keys[2], '')
+            input = input.replace(keys[2], '')
 
     return score
 

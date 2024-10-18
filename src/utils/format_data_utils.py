@@ -2,12 +2,11 @@ import re
 import unicodedata
 
 replacements = [
-    {"key": " p ", "value": " phuong "},
+    {"key": "p.", "value": " phuong "},
     {"key": " h ", "value": " "},
     {"key": " tx ", "value": " "},
     {"key": " tp ", "value": " "},
     {"key": " hcm", "value": " ho chi minh"},
-    {"key": " 0", "value": " "},
 ]
 
 def format_zero(text):
@@ -15,25 +14,34 @@ def format_zero(text):
     return re.sub(r'(phuong) 0([1-9])', r'\1 \2', text)
 
 def remove_accents(text):
-    """Loại bỏ dấu tiếng Việt."""
+    """Loại bỏ dấu tiếng Việt và chuyển đổi ký tự có dấu thành ký tự không dấu."""
+    # Chuyển đổi thành dạng NFKD để tách các dấu
     nfkd_form = unicodedata.normalize('NFKD', text)
-    return ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+    
+    # Loại bỏ các dấu
+    text_without_accents = ''.join([c for c in nfkd_form if not unicodedata.combining(c)])
+    
+    # Thay thế các ký tự cụ thể
+    text_without_accents = text_without_accents.replace('đ', 'd').replace('Đ', 'D')
+    
+    return text_without_accents
 
 def format_address(address):
     # Bước 1: Chuyển chuỗi về dạng chữ thường và không dấu
     address = address.lower()
     address = remove_accents(address)
 
-    # Bước 2: Thay thế các ký tự đặc biệt cụ thể bằng khoảng trắng
-    special_chars = ['#', '!', ',', '.', '-']
-    for char in special_chars:
-        address = address.replace(char, ' ')
-
      # Bước 3: Thay thế các từ khóa
     for replacement in replacements:
         key = replacement['key']
         value = replacement['value']
         address = address.replace(key, value)
+
+    # print(address)
+    # Bước 2: Thay thế các ký tự đặc biệt cụ thể bằng khoảng trắng
+    special_chars = ['#', '!', ',', '.', '-']
+    for char in special_chars:
+        address = address.replace(char, ' ')
     
     # Bước 4: Xử lý "Phường 0X"
     address = format_zero(address)
