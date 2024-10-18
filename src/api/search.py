@@ -30,13 +30,11 @@ async def search(request: SearchRequest):
 @router.get('/locations')
 async def search_location(q: str = None):
     user_input = q
-    print(user_input)
     if not user_input:
         raise HTTPException(status_code=400, detail="Input không hợp lệ")
 
     # Tiền xử lý input
     formatted_input = format_address(user_input)
-    print(formatted_input)
 
     # Tìm kiếm và lấy kết quả
     best_matches = find_best_matches(formatted_input, data)
