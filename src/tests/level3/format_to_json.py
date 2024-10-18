@@ -1,7 +1,7 @@
 import pandas as pd 
 import json
 import os
-from format_data_utils import nomalize_vn
+from format_data_utils import nomalize_vn, format_zero
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 input_file_path = os.path.join(current_dir, '../../data/data.xlsx')
@@ -34,7 +34,7 @@ df_unique.loc[:, 'city'] = df_unique['city'].apply(lambda x: x)
 
 # Tạo cột keys
 df_unique.loc[:, 'district_nomal'] = df_unique['district'].apply(lambda x: nomalize_vn(x))
-df_unique.loc[:, 'ward_nomal'] = df_unique['ward'].apply(lambda x: nomalize_vn(x))
+df_unique.loc[:, 'ward_nomal'] = df_unique['ward'].apply(lambda x: format_zero(nomalize_vn(x)))
 df_unique.loc[:, 'city_nomal'] = df_unique['city'].apply(lambda x: nomalize_vn(x))
 
 df_unique.loc[:, 'keys'] = df_unique.apply(lambda row: [row['ward_nomal'], row['district_nomal'], row['city_nomal']], axis=1)

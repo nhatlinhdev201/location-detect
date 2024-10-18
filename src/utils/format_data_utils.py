@@ -10,9 +10,9 @@ replacements = [
     {"key": " 0", "value": " "},
 ]
 
-def format_phuong(text):
+def format_zero(text):
     # Sử dụng regex để thay thế "Phường 0X" thành "Phường X"
-    return re.sub(r'(Phường) 0([1-9])', r'\1 \2', text)
+    return re.sub(r'(phuong) 0([1-9])', r'\1 \2', text)
 
 def remove_accents(text):
     """Loại bỏ dấu tiếng Việt."""
@@ -35,7 +35,10 @@ def format_address(address):
         value = replacement['value']
         address = address.replace(key, value)
     
-    # Bước 4: Bỏ đi các khoảng trắng thừa
+    # Bước 4: Xử lý "Phường 0X"
+    address = format_zero(address)
+    
+    # Bước 5: Bỏ đi các khoảng trắng thừa
     address = re.sub(r'\s+', ' ', address).strip()
     
     return address
