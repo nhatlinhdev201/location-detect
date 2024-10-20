@@ -36,7 +36,7 @@ df_unique.loc[:, 'district_nomal'] = df_unique['district'].apply(lambda x: nomal
 df_unique.loc[:, 'ward_nomal'] = df_unique['ward'].apply(lambda x: format_zero(nomalize_vn(x)))
 df_unique.loc[:, 'city_nomal'] = df_unique['city'].apply(lambda x: nomalize_vn(x))
 
-df_unique.loc[:, 'keys'] = df_unique.apply(lambda row: [row['city_nomal'], row['district_nomal'], row['ward_nomal']], axis=1)
+df_unique.loc[:, 'keys'] = df_unique.apply(lambda row: [" "+row['city_nomal']+" ", " "+row['district_nomal']+" ", " "+row['ward_nomal']+" "], axis=1)
 
 # Chuyển đổi thành định dạng json
 json_data = df_unique[['city', 'district', 'ward', 'district_id', 'ward_id', 'city_id', 'keys']].to_dict(orient='records')

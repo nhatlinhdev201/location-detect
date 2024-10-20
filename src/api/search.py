@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import json
 from src.utils.search_utils import find_best_matches
-from src.utils import format_address
+from src.utils.format_data_utils import format_address
 
 router = APIRouter()
 
@@ -12,20 +12,6 @@ with open('src/data/json_data_location.json', 'r', encoding='utf-8') as json_fil
 
 class SearchRequest(BaseModel):
     input: str
-
-@router.post('/')
-async def search(request: SearchRequest):
-    user_input = request.input
-    if not user_input:
-        raise HTTPException(status_code=400, detail="Input không hợp lệ")
-
-    # Tiền xử lý input
-    formatted_input = format_address(user_input)
-
-    # Tìm kiếm và lấy kết quả
-    best_matches = find_best_matches(formatted_input, data)
-
-    return best_matches
 
 @router.get('/locations')
 async def search_location(q: str = None):
@@ -37,6 +23,7 @@ async def search_location(q: str = None):
     formatted_input = format_address(user_input)
 
     # Tìm kiếm và lấy kết quả
-    best_matches = find_best_matches(formatted_input, data)
+    best_matches = find_best_matches(formatted_input, data, user_input)
 
     return best_matches
+
