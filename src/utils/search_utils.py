@@ -79,7 +79,7 @@ def extract_address(user_input, delimiters, ward):
         if match:
             return match.group(1).strip()
         
-    return "chưa xác định"
+    return None
     
     
 def find_best_matches(formatted_input, data, user_input):
@@ -121,3 +121,37 @@ def find_best_matches(formatted_input, data, user_input):
 
     return results_tmp
 
+def find_best(formatted_input, data, user_input):
+    """Tìm kiếm địa chỉ tốt nhất dựa trên input của người dùng."""
+    best_match = None
+    highest_score = float('-inf')  # Khởi tạo điểm cao nhất với giá trị âm vô cực
+
+    for entry in data:
+        score = calculate_score(formatted_input, entry['keys'])
+        total_score = sum(score.values())
+
+        if total_score > highest_score:  # Chỉ lưu lại nếu điểm cao hơn
+            highest_score = total_score
+            best_match = {
+                'city': entry['city'],
+                'city_id': entry['city_id'],
+                'district': entry['district'],
+                'district_id': entry['district_id'],
+                'ward': entry['ward'],
+                'ward_id': entry['ward_id'],
+                'score': total_score,
+                'ward_score': score['ward'],
+                'district_score': score['district'],
+                'city_score': score['city']
+            }
+
+    if best_match:  # Nếu có kết quả tốt nhất
+        delimiters = [" phuong ", " Phương ", "P.", "p.", "Phường ", "PHUONG ", "PHƯỜNG ",
+                       " xa", " Xã ", " X.", " x.", " XA ", " XÃ "]
+        
+        if best_match['ward_score'] == 1:
+            best_match['address'] = extract_address(user_input, delimiters, best_match['ward'])
+        else:
+            best_match['address'] = None
+
+    return best_match
