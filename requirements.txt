@@ -4,5 +4,6 @@ unidecode
 # flask
 fastapi
 uvicorn
+openpyxl
 
 #pip install -r requirements.txt
