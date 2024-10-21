@@ -99,3 +99,12 @@ def nomalize_vn(text):
     text = remove_accents(text)
     return text
 
+def check_phone_number(input_string: str) -> bool:
+    vietnam_phone_pattern = r'(?<!\d)(0[1-9]{1}[0-9]{8}|(?:\+84|84)[1-9]{1}[0-9]{8})(?!\d)'
+    international_phone_pattern = r'(?<!\d)(\+?\d{1,3}[- ]?)?\d{10}(?!\d)'
+
+    combined_pattern = f'({vietnam_phone_pattern})|({international_phone_pattern})'
+
+    if re.search(combined_pattern, input_string):
+        return False
+    return True 

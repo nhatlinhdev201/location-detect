@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 import json
 from src.models.location_detect_v1.execution.search_utils import find_best, find_best_matches
-from src.models.location_detect_v1.execution.format_data_utils import format_address
+from src.models.location_detect_v1.execution.format_data_utils import format_address, check_phone_number
 from src.models.location_detect_v1.execution.format_to_json import import_data
 from typing import List
 from pydantic import BaseModel
@@ -41,13 +41,21 @@ async def analyze_multiple_locations(request: AddressRequest):
     results = []
 
     for index, user_input in enumerate(request.locations):
-        formatted_input = format_address(user_input)  
-        best_match = find_best(formatted_input, data, user_input) 
+        if check_phone_number(user_input):
+            formatted_input = format_address(user_input)  
+            best_match = find_best(formatted_input, data, user_input) 
 
-        results.append({
-            'index': index,
-            'data': best_match if best_match else "Không tìm thấy kết quả"
-        })
+            results.append({
+                'index': index,
+                'data': best_match if best_match else "Không tìm thấy kết quả"
+            })
+        else:
+            results.append({
+                'index': index,
+                'data': {
+                    'error': "Vui lòng không để số điện thoại trong vị trí !"
+                }
+            })
 
     return results
 

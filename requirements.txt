@@ -5,5 +5,8 @@ unidecode
 fastapi
 uvicorn
 openpyxl
+pymongo
+motor
+python-dotenv
 
 #pip install -r requirements.txt
