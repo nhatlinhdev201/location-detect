@@ -54,6 +54,8 @@ def format_number(text):
     return text
 
 def remove_accents(text):
+    text = text.lower()
+
     """Loại bỏ dấu tiếng Việt và chuyển đổi ký tự có dấu thành ký tự không dấu."""
     # Chuyển đổi thành dạng NFKD để tách các dấu
     nfkd_form = unicodedata.normalize('NFKD', text)
@@ -68,7 +70,6 @@ def remove_accents(text):
 
 def format_address(address):
     # Bước 1: Chuyển chuỗi về dạng chữ thường và không dấu
-    address = address.lower()
     address = remove_accents(address)
     address = address.replace(",", " ")
 
