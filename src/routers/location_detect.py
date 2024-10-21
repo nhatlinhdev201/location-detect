@@ -24,11 +24,15 @@ async def search_location(q: str = None):
     if not user_input:
         raise HTTPException(status_code=400, detail="Input không hợp lệ")
 
-    # Tiền xử lý input
-    formatted_input = format_address(user_input)
+    if check_phone_number(user_input):
+          # Tiền xử lý input
+         formatted_input = format_address(user_input)    
 
-    # Tìm kiếm và lấy kết quả
-    best_matches = find_best_matches(formatted_input, data, user_input)
+         # Tìm kiếm và lấy kết quả
+         best_matches = find_best_matches(formatted_input, data, user_input)
+    else:
+        best_matches = [{'error': "Vui lòng không nhập số điện thoại trong địa chỉ !"}]
+
 
     return best_matches
 
