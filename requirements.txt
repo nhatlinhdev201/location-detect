@@ -1,7 +1,5 @@
-# Flask
 pandas
 unidecode
-# flask
 fastapi
 uvicorn
 openpyxl
