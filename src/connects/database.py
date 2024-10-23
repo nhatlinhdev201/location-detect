@@ -1,20 +1,18 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import load_dotenv
-import os
-from pymongo.errors import PyMongoError  # Vẫn giữ import này
+# from motor.motor_asyncio import AsyncIOMotorClient
+# import os
+# from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
-MONGO_URI = os.getenv('MONGO_URI')
+# MONGO_URI = os.getenv('MONGO_URI')
+# DATABASE_NAME = os.getenv('DATABASE_NAME')
 
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["your_database_name"] 
+# class MongoDB:
+#     def __init__(self, uri: str, db_name: str):
+#         self.client = AsyncIOMotorClient(uri)
+#         self.db = self.client[db_name]
 
-async def get_database():
-    try:
-        await client.admin.command('ping') 
-        print("Kết nối tới MongoDB đã được thiết lập thành công.")
-        return db  
-    except PyMongoError:
-        print("Không thể kết nối tới MongoDB.")
-        return None
+#     async def get_collection(self, collection_name: str):
+#         return self.db[collection_name]
+
+# mongo_db = MongoDB(MONGO_URI, DATABASE_NAME)

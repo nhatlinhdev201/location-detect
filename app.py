@@ -2,7 +2,6 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.routers.main import router_detect
-from src.connects.database import get_database
 
 app = FastAPI()
 

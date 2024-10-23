@@ -1,6 +1,9 @@
-import json
 import re
-from src.models.location_detect_v1.execution.format_data_utils import remove_accents, format_address
+from src.models.location_detect_v1.execution.format_data_utils import remove_accents, format_address, nomalize_vn
+
+delimiters_ward = [" phuong ", " p.", " xa ", " x.", " khom " ]
+delimiters_city = [" tp ", " thanh pho ", " tp.", " tinh ", " t.", " t "]
+delimiters_district = [" quan ", " q.", " huyen ", " h.", " tx"]
 
 def preprocess_input(user_input):
     """Chuẩn hóa input người dùng bằng cách sử dụng hàm format_address."""
@@ -53,12 +56,12 @@ def calculate_score(user_input, keys):
         
     return score
 
+
+
 def extract_address(user_input, result): 
 
     user_input_tmp = remove_accents(user_input)
 
-    delimiters_city = [" tp ", " thanh pho ", " tp.", " tinh ", " t.", " t "]
-    
     if result['city_score'] == 1 and result['district_score'] != 1 and result['ward_score'] != 1:
         """Cắt phần địa chỉ trước chuỗi ngăn cách từ user_input_tmp."""
         for delimiter in delimiters_city:
@@ -73,7 +76,7 @@ def extract_address(user_input, result):
                 return user_input[:delimiter_start].strip().rstrip(",")
 
         # Nếu không tìm thấy trong delimiters_city, kiểm tra với city
-        pattern = rf"(.*?)\s*{re.escape(result['city'])}"
+        pattern = rf"(.*?)\s*{re.escape(nomalize_vn(result['city']))}"
         match = re.search(pattern, user_input_tmp, re.IGNORECASE)  
         if match:
             # Lấy vị trí của city
@@ -83,8 +86,6 @@ def extract_address(user_input, result):
             return user_input[:city_start].strip().rstrip(",")
           
     #########################################################
-
-    delimiters_district = [" quan ", " q.", " huyen ", " h.", " tx"]
     
     if result['district_score'] == 1 and result['city_score'] == 1 and result['ward_score'] != 1:
         """Cắt phần địa chỉ trước chuỗi ngăn cách từ user_input."""
@@ -110,7 +111,7 @@ def extract_address(user_input, result):
             # Cắt trên user_input và trả về kết quả
             return user_input[:delimiter_start].strip().rstrip(",")
 
-        pattern = rf"(.*?)\s*{re.escape(result['district'])}"
+        pattern = rf"(.*?)\s*{re.escape(nomalize_vn(result['district']))}"
         match = re.search(pattern, user_input_tmp, re.IGNORECASE)  
         if match:
             # Lấy vị trí của delimiter
@@ -118,8 +119,7 @@ def extract_address(user_input, result):
             # Cắt trên user_input và trả về kết quả
             return user_input[:delimiter_start].strip().rstrip(",")
         
-    #########################################################
-    delimiters_ward = [" phuong ", " p.", " xa ", " x.", " khom " ]
+    #########################################################   
     
     if result['ward_score'] == 1 and result['city_score'] == 1 and result['district_score'] == 1:
         """Cắt phần địa chỉ trước chuỗi ngăn cách từ user_input."""
@@ -144,7 +144,7 @@ def extract_address(user_input, result):
             # Cắt trên user_input và trả về kết quả
             return user_input[:delimiter_start].strip().rstrip(",")
 
-        pattern = rf"(.*?)\s*{re.escape(result['ward'])}"
+        pattern = rf"(.*?)\s*{re.escape(nomalize_vn(result['ward']))}"
         match = re.search(pattern, user_input_tmp, re.IGNORECASE)  
         if match:
             # Lấy vị trí của delimiter
