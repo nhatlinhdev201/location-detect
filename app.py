@@ -1,8 +1,8 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.connects.curd import crud
-from src.routers.location_detect import router as location_detect_router
+# from src.connects.curd import crud
+# from src.routers.location_detect import router as location_detect_router
 from src.routers.location_detect_v2 import router as location_detect_router_v2
 
 
