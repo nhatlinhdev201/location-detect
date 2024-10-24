@@ -13,6 +13,14 @@ class Address(BaseModel):
     street_name: str
     type_address: str
 
+class Address_3(BaseModel):
+    city_id: int
+    city_name: str
+    district_id: int
+    district_name: str
+    ward_id: int
+    ward_name: str
+
 class ListAddress(BaseModel):
     addresses: List[Address]
 

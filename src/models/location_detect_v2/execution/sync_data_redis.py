@@ -1,5 +1,5 @@
 # import pandas as pd
-# from src.models.location_detect_v1.execution.format_data_utils import nomalize_vn, format_zero
+# from src.models.location_detect_v2.execution.format_data_utils import nomalize_vn, format_zero
 
 # def process_api_data(data_list):
 

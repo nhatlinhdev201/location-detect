@@ -1,9 +1,9 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# from src.connects.curd import crud
+from src.connects.curd import crud
 from src.routers.location_detect import router as location_detect_router
-# from src.routers.location_detect_v2 import router as location_detect_router_v2
+from src.routers.location_detect_v2 import router as location_detect_router_v2
 
 
 app = FastAPI()
@@ -19,8 +19,8 @@ app.add_middleware(
 
 
 # Đăng ký router
-app.include_router(location_detect_router, prefix="/api/v1")
-# app.include_router(location_detect_router_v2, prefix="/api/v2")
+# app.include_router(location_detect_router, prefix="/api/v1")
+app.include_router(location_detect_router_v2, prefix="/api/v1")
 # app.include_router(crud, prefix="/api/v3")
 
 
