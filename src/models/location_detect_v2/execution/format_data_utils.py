@@ -22,35 +22,17 @@ def format_zero(text):
     return re.sub(r'(phuong) 0([1-9])', r'\1 \2', text)
 
 def format_number(text):
-    # Thay thế "phường 0X" thành "phường X" (X là số từ 1 đến 9)
     text = re.sub(r'(phuong) 0([1-9])', r'\1 \2', text)
 
-    # Thay thế "quận 0X" thành "quận X" (X là số từ 1 đến 9)
     text = re.sub(r'(quan) 0([1-9])', r'\1 \2', text)
 
-    # # Thay thế "P0X" hoặc "PX" thành "phường X" (X là số từ 1 đến 9)
-    # text = re.sub(r'P0?([1-9])', r'phuong \1', text)
-
-    # # Thay thế "Q0X" hoặc "QX" thành "quận X" (X là số từ 1 đến 9)
-    # text = re.sub(r'Q0?([1-9])', r'quan \1', text)
-
-    # Thay thế "p0X" hoặc "pX" thành "phường X" (X là số từ 1 đến 9)
     text = re.sub(r'p0?([1-9])', r'phuong \1', text)
 
-    # Thay thế "q0X" hoặc "qX" thành "quận X" (X là số từ 1 đến 9)
     text = re.sub(r'q0?([1-9])', r'quan \1', text)
 
-    # Thay thế "P+số" (số từ 1 đến 9) thành "phường + số" (tránh thay thế P0)
-    # text = re.sub(r'P([1-9])', r'phuong \1', text)   # Xử lý với P1 - P9
+    text = re.sub(r'p([1-9])', r'phuong \1', text)   
 
-    # # Thay thế "Q+số" (số từ 1 đến 9) thành "quận + số" (tránh thay thế Q0)
-    # text = re.sub(r'Q([1-9])', r'quan \1', text)     # Xử lý với Q1 - Q9
-
-     # Thay thế "P+số" (số từ 1 đến 9) thành "phường + số" (tránh thay thế P0)
-    text = re.sub(r'p([1-9])', r'phuong \1', text)   # Xử lý với P1 - P9
-
-    # Thay thế "Q+số" (số từ 1 đến 9) thành "quận + số" (tránh thay thế Q0)
-    text = re.sub(r'q([1-9])', r'quan \1', text)     # Xử lý với Q1 - Q9
+    text = re.sub(r'q([1-9])', r'quan \1', text)   
 
     return text
 

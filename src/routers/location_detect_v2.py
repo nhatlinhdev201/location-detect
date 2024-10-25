@@ -205,7 +205,7 @@ async def analyze_multiple_locations(request: AddressRequest):
     if not request.locations:
         raise HTTPException(status_code=400, detail="Input không hợp lệ")
 
-    batch_size = 50
+    batch_size = 30
 
     if not request.locations:
         raise HTTPException(status_code=400, detail="Không có địa chỉ hợp lệ")
