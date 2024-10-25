@@ -31,6 +31,29 @@ async def create_index():
         return {"message": "Index created", "index_name": index_name}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/create_index_c4_v2")
+async def create_index():
+    try:
+        collection_4 = await mongo_db.get_collection(COLLECTION_4)
+        index_name = await collection_4.create_index([("address_key", "text")], name="address_key_index")
+
+        return {"message": "Index created", "index_name": index_name}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/drop_index_c4_v2")
+async def drop_index():
+    try:
+
+        collection_4 = await mongo_db.get_collection(COLLECTION_4)
+        await collection_4.drop_index("address_key_index")
+
+        return {"message": "Indexes dropped successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/create_index_c3")
 async def create_index():
     try:
@@ -43,7 +66,6 @@ async def create_index():
 @router.delete("/drop_index_c3")
 async def drop_index():
     try:
-
         collection_3 = await mongo_db.get_collection(COLLECTION_3)
         await collection_3.drop_index("compound_location_index")
 
@@ -56,7 +78,7 @@ async def drop_index():
     try:
 
         collection_4 = await mongo_db.get_collection(COLLECTION_4)
-        await collection_4.drop_index("compound_location_index")
+        await collection_4.drop_index("address_index")
 
         return {"message": "Indexes dropped successfully."}
     except Exception as e:
@@ -154,6 +176,24 @@ async def search_address(q: str = Query(..., min_length=1)):
 
     # Tìm kiếm địa chỉ chứa chuỗi người dùng nhập
     cursor = collection.find({"address": {"$regex": q, "$options": "i"}}).limit(5)
+    results = []
+    async for document in cursor:
+        document["_id"] = str(document["_id"]) 
+        results.append(document)  
+    return results
+
+@router.get("/search_v2", response_model=List[Dict[str, Any]])
+async def search_address(q: str = Query(..., min_length=1)):
+
+    user_input = q
+    if not user_input:
+        raise HTTPException(status_code=400, detail="Input không hợp lệ")
+
+    formatted_input = format_address(user_input)      
+    
+    collection = await mongo_db.get_collection(COLLECTION_4)
+    
+    cursor = collection.find({"address_key": {"$regex": formatted_input, "$options": "i"}}).limit(5)
     results = []
     async for document in cursor:
         document["_id"] = str(document["_id"]) 
