@@ -62,7 +62,7 @@ async def extract_address(user_input, result):
 
     user_input_tmp = remove_accents(user_input)
 
-    if result['ward_score'] == 1 and result['city_score'] == 1 and result['district_score'] == 1:
+    if result['ward_score'] == 1 and result['city_score'] == 1 :
         """Cắt phần địa chỉ trước chuỗi ngăn cách từ user_input."""
         for delimiter in delimiters_ward:
             # Tạo biểu thức regex để tìm phần địa chỉ trước delimiter
@@ -128,7 +128,7 @@ async def extract_address(user_input, result):
             return user_input[:delimiter_start].strip().rstrip(",")
         
     #########################################################   
-    if result['city_score'] == 1 and result['district_score'] != 1:
+    if result['city_score'] == 1 and result['district_score'] != 1 and result['ward_score'] != 1:
         """Cắt phần địa chỉ trước chuỗi ngăn cách từ user_input_tmp."""
         for delimiter in delimiters_city:
             # Tạo biểu thức regex để tìm phần địa chỉ trước delimiter
@@ -200,11 +200,11 @@ async def find_best(formatted_input, data, user_input):
         if total_score > highest_score:  
             highest_score = total_score
             best_match = {
-                'city': entry['city_name'],
+                'city_name': entry['city_name'],
                 'city_id': entry['city_id'],
-                'district': entry['district_name'],
+                'district_name': entry['district_name'],
                 'district_id': entry['district_id'],
-                'ward': entry['ward_name'],
+                'ward_name': entry['ward_name'],
                 'ward_id': entry['ward_id'],
                 'score': total_score,
                 'ward_score': score['ward'],
