@@ -16,6 +16,7 @@ def process_api_data_full(data_list):
     
     data_list = [
     {
+        "address_id": addr.address_id,
         "address": addr.address,
         "city_id": addr.city_id,
         "city_name": addr.city_name,
@@ -24,6 +25,8 @@ def process_api_data_full(data_list):
         "ward_id": addr.ward_id,
         "ward_name": addr.ward_name,
         "street_name": addr.street_name,
+        "lat": addr.lat,
+        "lng": addr.lng
     }
     for addr in data_list
     ]
@@ -34,7 +37,7 @@ def process_api_data_full(data_list):
     # Chuyển đổi dữ liệu thành DataFrame
     df = pd.DataFrame(data_list)
 
-    required_columns = ['city_name', 'city_id', 'district_name', 'district_id', 'ward_name', 'ward_id', 'address', 'street_name', 'type_address']
+    required_columns = ['address_id','city_name', 'city_id', 'district_name', 'district_id', 'ward_name', 'ward_id', 'address', 'street_name', 'lat', 'lng']
     
     for column in required_columns:
         if column not in df.columns:
@@ -52,7 +55,7 @@ def process_api_data_full(data_list):
     df_unique['address_key'] = df_unique['address'].apply(lambda x: format_address(x))
 
     # Chuyển đổi thành định dạng json
-    json_data = df_unique[['city_name', 'district_name', 'ward_name', 'district_id', 'ward_id', 'city_id', 'address', 'street_name','address_key']].to_dict(orient='records')
+    json_data = df_unique[['address_id','city_name', 'district_name', 'ward_name', 'district_id', 'ward_id', 'city_id', 'address', 'street_name','address_key', 'lat', 'lng']].to_dict(orient='records')
 
     return json_data
 

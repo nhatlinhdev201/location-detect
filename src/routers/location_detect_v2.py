@@ -148,13 +148,12 @@ async def call_api_mongodb_full():
             data_listtmp = json.loads(data_str)
             data_list = json.loads(data_listtmp)
 
-
             if isinstance(data_list, list):
                 # addresses = [Address(**item) for item in data_list]
                 addresses = []
                 for item in data_list:
                     # Kiểm tra xem các trường bắt buộc có tồn tại và không phải là null
-                    if all(field in item and item[field] is not None for field in ['city_name', 'district_name', 'ward_name', 'district_id', 'ward_id', 'city_id', 'address', 'street_name']):
+                    if all(field in item and item[field] is not None for field in ['address_id','city_name', 'district_name', 'ward_name', 'district_id', 'ward_id', 'city_id', 'address', 'street_name', 'lat', 'lng']):
                         addresses.append(Address(**item))
                 
                 processed_data = process_api_data_mongo_full(addresses)  

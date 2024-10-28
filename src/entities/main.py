@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List
 
 class Address(BaseModel):
+    address_id: int
     address: str
     city_id: int
     city_name: str
@@ -10,6 +11,8 @@ class Address(BaseModel):
     ward_id: int
     ward_name: str
     street_name: str
+    lat: str
+    lng: str
 
 class Address_3(BaseModel):
     city_id: int
