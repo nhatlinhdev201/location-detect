@@ -85,8 +85,9 @@ async def drop_index():
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/sync-data-mongodb")
-async def call_api_mongodb():
-    url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
+async def call_api_mongodb(): 
+    # url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
+    url = "https://api-v4-erp.vps.vn/api/ApiMain/API_spCallServer"
     headers = {"Content-Type": "application/json"}
     payload = {
         "Json": "",
@@ -129,7 +130,8 @@ async def call_api_mongodb():
 
 @router.get("/sync-data-mongodb-full")
 async def call_api_mongodb_full():
-    url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
+    # url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
+    url = "https://api-v4-erp.vps.vn/api/ApiMain/API_spCallServer"
     headers = {"Content-Type": "application/json"}
     payload = {
         "Json": "",
