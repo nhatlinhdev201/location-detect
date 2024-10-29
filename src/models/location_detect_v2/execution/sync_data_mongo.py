@@ -26,9 +26,6 @@ def process_api_data(data_list):
     for addr in data_list
 ]
 
-    # print(data_list)
-    # return 'ok'
-
     if not all(isinstance(item, dict) for item in data_list):
         raise ValueError("Mỗi phần tử trong data_list phải là một từ điển")
 
@@ -65,3 +62,49 @@ def process_api_data(data_list):
     return json_data
 
 
+def process_api_data_location(data_list):
+
+    # Kiểm tra kiểu dữ liệu của data_list
+    if not isinstance(data_list, list):
+        raise ValueError("data_list phải là một danh sách")
+    
+    data_list = [
+    {
+        "id": addr.id,
+        "name": addr.name,
+        "code_local": addr.code_local,
+        "type": addr.type,
+        "parent_id": addr.parent_id,
+    }
+    for addr in data_list
+]
+
+    if not all(isinstance(item, dict) for item in data_list):
+        raise ValueError("Mỗi phần tử trong data_list phải là một từ điển")
+
+    # Chuyển đổi dữ liệu thành DataFrame
+    df = pd.DataFrame(data_list)
+
+    required_columns = ['id', 'name', 'code_local', 'type', 'parent_id']
+    
+    for column in required_columns:
+        if column not in df.columns:
+            df[column] = None  
+
+    # Lọc các cột cần thiết
+    df_filtered = df[required_columns].copy()
+
+    # Xóa bản sao và tạo bản sao mới
+    df_unique = df_filtered.drop_duplicates().copy() 
+
+    # Chuyển đổi thành định dạng json
+    json_data = df_unique[['id', 'name', 'code_local', 'type', 'parent_id']].to_dict(orient='records')
+
+    return json_data
+
+
+
+def serialize_document(doc):
+    doc_copy = doc.copy() 
+    doc_copy.pop('_id', None) 
+    return doc_copy

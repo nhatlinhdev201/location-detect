@@ -1,24 +1,25 @@
 import os
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import  APIRouter, HTTPException, Query
 import httpx
 import json
 import asyncio
-from src.entities.main import Address, Address_3
-from src.models.location_detect_v2.execution.sync_data_mongo import process_api_data as process_api_data_mongo
+from src.entities.main import Address, Address_3, Address_level
+from src.models.location_detect_v2.execution.sync_data_mongo import process_api_data as process_api_data_mongo, process_api_data_location, serialize_document
 from src.models.location_detect_v2.execution.sync_data_mongo_full import process_api_data_full as process_api_data_mongo_full
 from src.models.location_detect_v2.execution.search_utils import find_best_matches
 from src.models.location_detect_v2.execution.format_data_utils import format_address, check_phone_number
 from src.connects.database import mongo_db
 from src.entities.main import AddressRequest
 from src.models.location_detect_v2.execution.utils.mongo_execution import process_location, query_data
-from bson import ObjectId
 from typing import List, Dict, Any
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
-
+COLLECTION_2 = os.getenv('COLLECTION_2')
 COLLECTION_3 = os.getenv('COLLECTION_3')
 COLLECTION_4 = os.getenv('COLLECTION_4')
+API_DATA = os.getenv('API_DATA')
 
 router = APIRouter()
 
@@ -87,7 +88,7 @@ async def drop_index():
 @router.get("/sync-data-mongodb")
 async def call_api_mongodb(): 
     # url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
-    url = "https://api-v4-erp.vps.vn/api/ApiMain/API_spCallServer"
+    url = "{API_DATA}/api/ApiMain/API_spCallServer"
     headers = {"Content-Type": "application/json"}
     payload = {
         "Json": "",
@@ -131,7 +132,7 @@ async def call_api_mongodb():
 @router.get("/sync-data-mongodb-full")
 async def call_api_mongodb_full():
     # url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
-    url = "https://api-v4-erp.vps.vn/api/ApiMain/API_spCallServer"
+    url = "{API_DATA}/api/ApiMain/API_spCallServer"
     headers = {"Content-Type": "application/json"}
     payload = {
         "Json": "",
@@ -170,6 +171,50 @@ async def call_api_mongodb_full():
             raise HTTPException(status_code=500, detail=f"JSON decode error: {str(e)}")
     else:
         raise HTTPException(status_code=response.status_code, detail=response.text)
+
+@router.get("/sync-data-location")
+async def call_api_mongodb(): 
+    url = f"{API_DATA}/api/ApiMain/API_spCallServer"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "Json": "",
+        "func": "CPN_spLocationLevel",
+        "API_key": "netcoApikey2025"
+    }
+
+    async with httpx.AsyncClient(timeout=60) as client:
+        response = await client.post(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        try:
+            data_str = response.text.replace("\\/", "/")
+            data_listtmp = json.loads(data_str)
+            data_list = json.loads(data_listtmp)
+
+
+            if isinstance(data_list, list):
+                # addresses = [Address(**item) for item in data_list]
+                addresses = []
+                for item in data_list:
+                    # Kiểm tra xem các trường bắt buộc có tồn tại và không phải là null
+                    if all(field in item and item[field] is not None for field in['id', 'name', 'code_local', 'type', 'parent_id']):
+                        addresses.append(Address_level(**item))
+                
+                processed_data = process_api_data_location(addresses)  
+                if processed_data:
+                    collection = await mongo_db.get_collection(COLLECTION_2)
+                    await collection.delete_many({})
+                    await collection.insert_many(processed_data)
+                    return {"message": "Success"}
+                else:
+                    raise HTTPException(status_code=500, detail="No processed data available")
+            else:
+                raise HTTPException(status_code=500, detail="Invalid data format: Expected a list")
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=500, detail=f"JSON decode error: {str(e)}")
+    else:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
+
 
 @router.get("/search", response_model=List[Dict[str, Any]])
 async def search_address(q: str = Query(..., min_length=1)):
@@ -242,3 +287,25 @@ async def search_location(q: str = None):
         best_matches = [{'error': "Vui lòng không nhập số điện thoại trong địa chỉ !", 'address': user_input}]
 
     return best_matches
+
+@router.get("/search_v3")
+async def search_address(
+    input: str,
+    parent_id: int = Query(None),
+    type: int = Query(None)
+):
+    collection = await mongo_db.get_collection(COLLECTION_2)
+
+    query = {"name": {"$regex": re.compile(input, re.IGNORECASE)}}
+
+    if type is not None:
+        query["type"] = type
+    if parent_id is not None:
+        query["parent_id"] = parent_id
+    
+    try:
+        cursor = collection.find(query)
+        results = [serialize_document(doc) for doc in await cursor.to_list(None)]  # Chuyển đổi các tài liệu
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

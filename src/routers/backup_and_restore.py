@@ -11,7 +11,7 @@ MONGO_URI = os.getenv('MONGO_URI')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 host = os.getenv('MONGO_HOST')
 backup_dir = os.getenv('BACKUP_DIR')
-
+MONGO_DIR = os.getenv('MONGO_DIR')
 
 # Thư mục để lưu backup
 # backup_dir = "/home/nhatlinhdev201/data_backup" 
@@ -23,7 +23,7 @@ async def backup_database():
     backup_file = os.path.join(backup_dir, f"backup_{timestamp}.gz")
 
     # Lệnh để backup dữ liệu
-    command = f"mongodump --uri={MONGO_URI} --gzip --archive={backup_file} --port {host}"  
+    command = f"{MONGO_DIR}dump --uri={MONGO_URI} --gzip --archive={backup_file} --port {host}"  
 
     try:
         subprocess.run(command, shell=True, check=True)
@@ -39,7 +39,7 @@ async def restore_database(backup_file: str):
         raise HTTPException(status_code=404, detail="Backup file not found")
 
     # Lệnh để khôi phục dữ liệu
-    command = f"mongorestore --gzip --archive={backup_path} --uri={MONGO_URI} --port {host}"  
+    command = f"{MONGO_DIR}restore --gzip --archive={backup_path} --uri={MONGO_URI} --port {host}"  
 
     try:
         subprocess.run(command, shell=True, check=True)

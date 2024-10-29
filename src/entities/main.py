@@ -22,6 +22,13 @@ class Address_3(BaseModel):
     ward_id: int
     ward_name: str
 
+class Address_level(BaseModel):
+    id: int
+    name: str
+    code_local: str
+    type: int
+    parent_id: int
+
 class ListAddress(BaseModel):
     addresses: List[Address]
 
