@@ -12,6 +12,7 @@ from src.connects.database import mongo_db
 from src.entities.main import AddressRequest
 from src.models.location_detect_v2.execution.utils.mongo_execution import process_location, query_data
 from typing import List, Dict, Any
+from typing import Optional
 import re
 from dotenv import load_dotenv
 
@@ -290,22 +291,29 @@ async def search_location(q: str = None):
 
 @router.get("/search_v3")
 async def search_address(
-    input: str,
-    parent_id: int = Query(None),
-    type: int = Query(None)
+    q: str,
+    parent_id: int = Query(0, ge=0),  
+    type: int = Query(0, ge=0)  
 ):
+    input = q
+    if not input:  
+        return []
+
     collection = await mongo_db.get_collection(COLLECTION_2)
 
-    query = {"name": {"$regex": re.compile(input, re.IGNORECASE)}}
+    # Bắt đầu với query cơ bản
+    query = {"name": {"$regex": re.compile(input.strip(), re.IGNORECASE)}}
 
-    if type is not None:
+    # Thêm điều kiện nếu có
+    if type != 0: 
         query["type"] = type
-    if parent_id is not None:
+    if parent_id != 0: 
         query["parent_id"] = parent_id
-    
+
     try:
         cursor = collection.find(query)
-        results = [serialize_document(doc) for doc in await cursor.to_list(None)]  # Chuyển đổi các tài liệu
-        return results
+        results = [serialize_document(doc) for doc in await cursor.to_list(None)]
+        return results  # Nếu không có kết quả, sẽ trả về mảng rỗng
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
