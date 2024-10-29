@@ -26,7 +26,7 @@ app.include_router(backup_and_restore_router, prefix="/api/data")
 # app.include_router(crud, prefix="/api/v3")
 
 
-@app.get('/')
+@app.get('/hello')
 async def root():
     return {"message": "Hello - I'm Linkk"}
 
