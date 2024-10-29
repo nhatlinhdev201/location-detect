@@ -9,20 +9,21 @@ load_dotenv()
 
 MONGO_URI = os.getenv('MONGO_URI')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
+host = os.getenv('MONGO_HOST')
+backup_dir = os.getenv('BACKUP_DIR')
+
 
 # Thư mục để lưu backup
-# backup_dir = "/home/ubuntu/data_backup" 
-backup_dir = "D:\\data"
+# backup_dir = "/home/nhatlinhdev201/data_backup" 
 os.makedirs(backup_dir, exist_ok=True)
 
 @router.post("/backup")
 async def backup_database():
-    # Tạo tên file backup dựa trên thời gian hiện tại
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     backup_file = os.path.join(backup_dir, f"backup_{timestamp}.gz")
 
     # Lệnh để backup dữ liệu
-    command = f"mongodump --uri={MONGO_URI} --gzip --archive={backup_file}"
+    command = f"mongodump --uri={MONGO_URI} --gzip --archive={backup_file} --port {host}"  
 
     try:
         subprocess.run(command, shell=True, check=True)
@@ -33,13 +34,12 @@ async def backup_database():
 
 @router.post("/restore")
 async def restore_database(backup_file: str):
-    # Kiểm tra xem file backup có tồn tại không
     backup_path = os.path.join(backup_dir, backup_file)
     if not os.path.exists(backup_path):
         raise HTTPException(status_code=404, detail="Backup file not found")
 
     # Lệnh để khôi phục dữ liệu
-    command = f"mongorestore --gzip --archive={backup_path} --uri={MONGO_URI}"
+    command = f"mongorestore --gzip --archive={backup_path} --uri={MONGO_URI} --port {host}"  
 
     try:
         subprocess.run(command, shell=True, check=True)
