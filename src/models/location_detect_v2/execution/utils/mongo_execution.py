@@ -41,13 +41,7 @@ async def process_location(index, user_input):
 
         # Truy vấn vào MongoDB
         collection = await mongo_db.get_collection(COLLECTION_3) 
-        # query = {
-        #     "$or": [
-        #         {"city_nomal": {"$in": input_keywords}},
-        #         {"district_nomal": {"$in": input_keywords}},
-        #         {"ward_nomal": {"$in": input_keywords}}
-        #     ]
-        # }
+
         query = {
             "$or": [
                 {"city_nomal": {"$regex": "|".join(input_keywords), "$options": "i"}},

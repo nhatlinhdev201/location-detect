@@ -244,6 +244,8 @@ async def search_address(q: str = Query(..., min_length=1)):
     results = []
     async for document in cursor:
         document["_id"] = str(document["_id"]) 
+        document["text"] = document["address"]
+        document["value"] = document["address"]
         results.append(document)  
     return results
 
