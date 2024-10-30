@@ -60,7 +60,7 @@ async def call_api_mongodb():
     else:
         raise HTTPException(status_code=response.status_code, detail=response.text)
     
-@router.post('/locations_v3')
+@router.post('/locations')
 async def analyze_multiple_locations(request: AddressRequest):
     if not request.locations:
         raise HTTPException(status_code=400, detail="Input không hợp lệ")
