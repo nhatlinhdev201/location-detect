@@ -1,5 +1,5 @@
 import pandas as pd
-from src.models.location_detect_v2.execution.format_data_utils import nomalize_vn, format_zero, format_address
+from src.models.location_detect_v2.execution.format_data_utils import nomalize_vn, format_zero
 
 def add_phuong_prefix(ward_name):
     if isinstance(ward_name, (int, float)):
@@ -97,10 +97,8 @@ def process_api_data_location(data_list):
     # Xóa bản sao và tạo bản sao mới
     df_unique = df_filtered.drop_duplicates().copy() 
 
-    df_unique['name_key'] = df_unique['name'].apply(lambda x: format_address(x))
-
     # Chuyển đổi thành định dạng json
-    json_data = df_unique[['id', 'name', 'code_local', 'type', 'parent_id', 'name_key']].to_dict(orient='records')
+    json_data = df_unique[['id', 'name', 'code_local', 'type', 'parent_id']].to_dict(orient='records')
 
     return json_data
 

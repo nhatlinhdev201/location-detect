@@ -4,13 +4,13 @@ import httpx
 import json
 import asyncio
 from src.entities.main import Address, Address_3, Address_level
-from src.models.location_detect_v2.execution.sync_data_mongo import process_api_data as process_api_data_mongo, process_api_data_location, serialize_document
-from src.models.location_detect_v2.execution.sync_data_mongo_full import process_api_data_full as process_api_data_mongo_full
-from src.models.location_detect_v2.execution.search_utils import find_best_matches
-from src.models.location_detect_v2.execution.format_data_utils import format_address, check_phone_number
+from src.models.location_detect_v3.execution.sync_data_mongo import process_api_data as process_api_data_mongo, process_api_data_location, serialize_document
+from src.models.location_detect_v3.execution.sync_data_mongo_full import process_api_data_full as process_api_data_mongo_full
+from src.models.location_detect_v3.execution.search_utils import find_best_matches
+from src.models.location_detect_v3.execution.format_data_utils import format_address, check_phone_number
 from src.connects.database import mongo_db
 from src.entities.main import AddressRequest
-from src.models.location_detect_v2.execution.utils.mongo_execution import process_location, query_data
+from src.models.location_detect_v3.execution.utils.mongo_execution import process_location, query_data
 from typing import List, Dict, Any
 from typing import Optional
 import re
@@ -34,7 +34,7 @@ async def create_index():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/create_index_c4_v2")
+@router.post("/create_index_c4_v3")
 async def create_index():
     try:
         collection_4 = await mongo_db.get_collection(COLLECTION_4)
@@ -44,7 +44,7 @@ async def create_index():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.delete("/drop_index_c4_v2")
+@router.delete("/drop_index_c4_v3")
 async def drop_index():
     try:
 
@@ -229,7 +229,7 @@ async def search_address(q: str = Query(..., min_length=1)):
         results.append(document)  
     return results
 
-@router.get("/search_v2", response_model=List[Dict[str, Any]])
+@router.get("/search_v3", response_model=List[Dict[str, Any]])
 async def search_address(q: str = Query(..., min_length=1)):
 
     user_input = q
@@ -291,41 +291,20 @@ async def search_location(q: str = None):
 
     return best_matches
 
-@router.get("/search_v2", response_model=List[Dict[str, Any]])
-async def search_address(q: str = Query(..., min_length=1)):
-
-    user_input = q
-    if not user_input:
-        raise HTTPException(status_code=400, detail="Input không hợp lệ")
-
-    formatted_input = format_address(user_input)      
-    
-    collection = await mongo_db.get_collection(COLLECTION_4)
-    
-    cursor = collection.find({"address_key": {"$regex": formatted_input, "$options": "i"}}).limit(5)
-    results = []
-    async for document in cursor:
-        document["_id"] = str(document["_id"]) 
-        document["text"] = document["address"]
-        document["value"] = document["address"]
-        results.append(document)  
-    return results
-
-
 @router.get("/search_v3")
 async def search_address(
     q: str,
     parent_id: int = Query(0, ge=0),  
     type: int = Query(0, ge=0)  
 ):
-    input = format_address(q)
+    input = q
     if not input:  
         return []
 
     collection = await mongo_db.get_collection(COLLECTION_2)
 
     # Bắt đầu với query cơ bản
-    query = {"name_key": {"$regex": re.compile(input.strip(), re.IGNORECASE)}}
+    query = {"name": {"$regex": re.compile(input.strip(), re.IGNORECASE)}}
 
     # Thêm điều kiện nếu có
     if type != 0: 
