@@ -93,9 +93,8 @@ async def find_best_matches(formatted_input, data, user_input):
     # Sắp xếp kết quả theo điểm tổng
     results.sort(key=lambda x: x['score'], reverse=True)
     results_tmp = results[:5]
-    
     # Lọc qua top 5 results_tmp, cắt user_input lấy vị trí cụ thể là phần phía trước ward
-    for result in results_tmp:
+    for result in results[:5]:
             result['address'] = await extract_address(user_input, result)
 
     return results_tmp

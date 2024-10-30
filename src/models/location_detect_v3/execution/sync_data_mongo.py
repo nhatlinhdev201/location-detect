@@ -1,5 +1,5 @@
 import pandas as pd
-from src.models.location_detect_v2.execution.format_data_utils import nomalize_vn, format_zero
+from src.models.location_detect_v3.execution.format_data_utils import nomalize_vn, format_zero
 
 def add_phuong_prefix(ward_name):
     if isinstance(ward_name, (int, float)):

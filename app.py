@@ -6,6 +6,7 @@ from src.routers.location_detect import router as location_detect_router
 from src.routers.location_detect_v2 import router as location_detect_router_v2
 from src.routers.location_detect_v3 import router as location_detect_router_v3
 from src.routers.backup_and_restore import router as backup_and_restore_router
+from src.routers.cache_management import cache_router
 
 
 app = FastAPI()
@@ -25,6 +26,7 @@ app.add_middleware(
 app.include_router(location_detect_router_v2, prefix="/api/v1")
 app.include_router(location_detect_router_v3, prefix="/api/v3")
 app.include_router(backup_and_restore_router, prefix="/api/data")
+app.include_router(cache_router, prefix="/api/cache")
 # app.include_router(crud, prefix="/api/v3")
 
 
