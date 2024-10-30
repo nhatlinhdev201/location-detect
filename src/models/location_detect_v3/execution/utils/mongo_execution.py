@@ -58,8 +58,9 @@ async def process_location(index, user_input):
 
         best_match = await find_best(formatted_input, results, user_input)
 
-        # Lưu kết quả vào cache
-        lru_cache[cache_key] = best_match if best_match else "Không tìm thấy kết quả"
+        if best_match['score'] == 3:
+            # Lưu kết quả vào cache
+            lru_cache[cache_key] = best_match if best_match else "Không tìm thấy kết quả"
 
         return {
             'index': index,  # Giữ chỉ số gốc
