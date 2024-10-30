@@ -58,7 +58,7 @@ async def process_location(index, user_input):
 
         best_match = await find_best(formatted_input, results, user_input)
 
-        if best_match['score'] == 3:
+        if best_match['score'] == 3 or (best_match['ward_score'] == 1 and best_match['city_score'] == 1):
             # Lưu kết quả vào cache
             lru_cache[cache_key] = best_match if best_match else "Không tìm thấy kết quả"
 

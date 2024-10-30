@@ -216,7 +216,6 @@ async def call_api_mongodb():
     else:
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
-
 @router.get("/search", response_model=List[Dict[str, Any]])
 async def search_address(q: str = Query(..., min_length=1)):
     collection = await mongo_db.get_collection(COLLECTION_4)
@@ -318,16 +317,19 @@ async def search_address(
     parent_id: int = Query(0, ge=0),  
     type: int = Query(0, ge=0)  
 ):
-    input = format_address(q)
+    input = ''
+    if q.strip() != '_':
+       input = format_address(q)
+    else:
+        input = " "
     if not input:  
         return []
 
     collection = await mongo_db.get_collection(COLLECTION_2)
 
     # Bắt đầu với query cơ bản
-    query = {"name_key": {"$regex": re.compile(input.strip(), re.IGNORECASE)}}
+    query = {"name_key": {"$regex": re.compile(input, re.IGNORECASE)}}
 
-    # Thêm điều kiện nếu có
     if type != 0: 
         query["type"] = type
     if parent_id != 0: 
