@@ -167,6 +167,10 @@ async def process_location(user_input, collection_data):
         return result
     else:
         return {'data': {'error': "Vui lòng không để số điện thoại trong vị trí !", 'address': user_input}}
+def process_location_sync(user_input, collection_data):
+    # Chạy hàm process_location trong một bối cảnh đồng bộ
+    return asyncio.run(process_location(user_input, collection_data))
+
 @router.post('/locations')
 async def analyze_multiple_locations(request: AddressRequest):
     if not request.locations:
@@ -175,8 +179,18 @@ async def analyze_multiple_locations(request: AddressRequest):
     collection = await mongo_db.get_collection(COLLECTION_3)
     collection_data = await get_data_from_collection(format_address(request.locations[0]), collection)
 
-    results = await asyncio.gather(
-        *[process_location(user_input, collection_data) for user_input in request.locations]
-    )
+    with ProcessPoolExecutor(max_workers=10) as executor:
+        loop = asyncio.get_event_loop()
+        futures = [
+            loop.run_in_executor(executor, process_location_sync, user_input, collection_data)
+            for user_input in request.locations
+        ]
+        raw_results = await asyncio.gather(*futures)
 
-    return results
+    # Thêm chỉ số vào kết quả
+    indexed_results = [
+        {'index': index, 'data': result['data']}
+        for index, result in enumerate(raw_results)
+    ]
+
+    return indexed_results
