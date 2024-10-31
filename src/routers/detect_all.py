@@ -7,6 +7,7 @@ from src.connects.database import mongo_db
 from src.entities.main import AddressRequest
 from concurrent.futures import ProcessPoolExecutor
 import asyncio
+from src.connects.caching import lru_cache
 
 load_dotenv()
 COLLECTION_3 = os.getenv('COLLECTION_3')
@@ -147,15 +148,25 @@ async def get_data_from_collection(formatted_input, collection):
 async def process_location(user_input, collection_data):
     formatted_input = format_address(user_input)
 
+    # Kiểm tra cache
+    cache_key = formatted_input
+    if cache_key in lru_cache:
+        return {'data': lru_cache[cache_key]}  # Trả kết quả từ cache
+
     if not user_input:
         return {'data': {'error': "Input không hợp lệ", 'address': user_input}}
 
     if contains_phone_number(user_input):
         best_match = await find_best(formatted_input, collection_data, user_input)
-        return {'data': best_match if best_match else "Không tìm thấy kết quả"}
+        result = {'data': best_match if best_match else "Không tìm thấy kết quả"}
+        
+        # Lưu vào cache
+        if best_match['score'] == 3 or (best_match['ward_score'] == 1 and best_match['city_score'] == 1):
+            lru_cache[cache_key] = result
+
+        return result
     else:
         return {'data': {'error': "Vui lòng không để số điện thoại trong vị trí !", 'address': user_input}}
-
 @router.post('/locations')
 async def analyze_multiple_locations(request: AddressRequest):
     if not request.locations:
