@@ -9,11 +9,14 @@ from src.connects.database import mongo_db
 from src.entities.main import AddressRequest
 from src.models.location_detect_v3.execution.utils.mongo_execution import process_location
 from dotenv import load_dotenv
+from concurrent.futures import ProcessPoolExecutor
 
 load_dotenv()
 COLLECTION_5 = os.getenv('COLLECTION_5')
 API_DATA = os.getenv('API_DATA')
 BATCH_SIZE = int(os.getenv('BATCH_SIZE'))
+max_workers = int(os.getenv('MAX_WORKER')) 
+
 
 router = APIRouter()
 
@@ -60,22 +63,70 @@ async def call_api_mongodb():
     else:
         raise HTTPException(status_code=response.status_code, detail=response.text)
     
+# @router.post('/locations')
+# async def analyze_multiple_locations(request: AddressRequest):
+#     if not request.locations:
+#         raise HTTPException(status_code=400, detail="Input không hợp lệ")
+
+#     batch_size = BATCH_SIZE
+#     results = []
+
+#     for i in range(0, len(request.locations), batch_size):
+#         batch = request.locations[i:i + batch_size]
+        
+#         tasks = [process_location(i + index, user_input) for index, user_input in enumerate(batch)]
+        
+#         batch_results = await asyncio.gather(*tasks)
+        
+#         results.extend(batch_results)
+    
+#     return results
+
+# @router.post('/locations')
+# async def analyze_multiple_locations(request: AddressRequest):
+#     if not request.locations:
+#         raise HTTPException(status_code=400, detail="Input không hợp lệ")
+
+#     results = []
+#     loop = asyncio.get_event_loop()
+#     max_workers = min(32, len(request.locations))  # Giới hạn số tiến trình tối đa theo số lượng địa chỉ
+
+#     with ProcessPoolExecutor(max_workers=max_workers) as executor:
+#         # Chia các địa chỉ thành các batch
+#         for i in range(0, len(request.locations), BATCH_SIZE):
+#             batch = request.locations[i:i + BATCH_SIZE]
+#             tasks = [
+#                 loop.run_in_executor(executor, process_location_sync, index, user_input)
+#                 for index, user_input in enumerate(batch)
+#             ]
+#             batch_results = await asyncio.gather(*tasks)
+#             results.extend(batch_results)
+
+#     return results
+
+# def process_location_sync(index, user_input):
+#     # Chuyển đổi bất đồng bộ sang đồng bộ
+#     loop = asyncio.get_event_loop()
+#     return loop.run_until_complete(process_location(index, user_input))
+
+
 @router.post('/locations')
 async def analyze_multiple_locations(request: AddressRequest):
     if not request.locations:
         raise HTTPException(status_code=400, detail="Input không hợp lệ")
 
-    batch_size = BATCH_SIZE
     results = []
+    loop = asyncio.get_event_loop()
 
-    for i in range(0, len(request.locations), batch_size):
-        batch = request.locations[i:i + batch_size]
-        
-        tasks = [process_location(i + index, user_input) for index, user_input in enumerate(batch)]
-        
-        batch_results = await asyncio.gather(*tasks)
-        
-        results.extend(batch_results)
-    
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        tasks = [
+            loop.run_in_executor(executor, process_location_sync, index, user_input)
+            for index, user_input in enumerate(request.locations)
+        ]
+        results = await asyncio.gather(*tasks)
+
     return results
 
+def process_location_sync(index, user_input):
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(process_location(index, user_input))
