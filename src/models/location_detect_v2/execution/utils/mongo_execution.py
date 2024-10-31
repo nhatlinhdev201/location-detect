@@ -36,6 +36,7 @@ async def process_location(index, user_input):
                 'address': user_input
             }
         }
+    
     if check_phone_number(user_input):
         input_keywords = formatted_input_tmp.split()
 

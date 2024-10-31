@@ -1,5 +1,5 @@
 import re
-from src.models.location_detect_v2.execution.format_data_utils import remove_accents, format_address, nomalize_vn
+from src.models.location_detect_v4.execution.format_data_utils import remove_accents, format_address, nomalize_vn
 
 delimiters_ward = [" phuong ", " p.", " xa ", " x.", " khom " ]
 delimiters_city = [" tp ", " thanh pho ", " tp.", " tinh ", " t.", " t "]
