@@ -313,8 +313,6 @@ async def find_best(formatted_input, data, user_input):
 
 async def get_data_from_collection(user_input, collection):
     formatted_input = format_address(user_input)  
-    # print('call db---------', formatted_input)
-
     formatted_input_tmp = formatted_input
 
     for replacement in replacements_tmp:
@@ -323,15 +321,6 @@ async def get_data_from_collection(user_input, collection):
         formatted_input_tmp = formatted_input_tmp.replace(key, value)
     
     input_keywords = formatted_input_tmp.split()
-    
-    # print('call db---------',input_keywords)
-    # query = {
-    #     "$or": [
-    #         {"city_nomal": {"$regex": "|".join(re.escape(keyword) for keyword in input_keywords), "$options": "i"}},
-    #         {"district_nomal": {"$regex": "|".join(re.escape(keyword) for keyword in input_keywords), "$options": "i"}},
-    #         {"ward_nomal": {"$regex": "|".join(re.escape(keyword) for keyword in input_keywords), "$options": "i"}}
-    #     ]
-    # }
 
     query = {
             "$or": [
@@ -346,10 +335,10 @@ async def get_data_from_collection(user_input, collection):
 
 async def process_location(user_input, collection_data):
     formatted_input = format_address(user_input).replace(" ", "")
-    cache_key = f"location:{formatted_input}"
+    # cache_key = f"location:{formatted_input}"
 
-    if cache_key in lru_cache:
-        return lru_cache[cache_key]
+    # if cache_key in lru_cache:
+    #     return lru_cache[cache_key]
 
     if not user_input:
         return {'data': {'error': "Input không hợp lệ", 'address': user_input}}
@@ -360,9 +349,9 @@ async def process_location(user_input, collection_data):
         best_match = await find_best(formatted_input, collection_data, user_input)
         result = {'data': best_match if best_match else "Không tìm thấy kết quả"}
 
-        # Ghi vào cache nếu có kết quả phù hợp
-        if best_match and (best_match['score'] == 3 or (best_match['ward_score'] == 1 and best_match['city_score'] == 1)):
-            lru_cache[cache_key] = result
+        # # Ghi vào cache nếu có kết quả phù hợp
+        # if best_match and (best_match['score'] == 3 or (best_match['ward_score'] == 1 and best_match['city_score'] == 1)):
+        #     lru_cache[cache_key] = result
 
         return result
         
