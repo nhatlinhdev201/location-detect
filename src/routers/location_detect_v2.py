@@ -130,6 +130,7 @@ async def call_api_mongodb():
     else:
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
+
 @router.get("/sync-data-mongodb-full")
 async def call_api_mongodb_full():
     # url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"

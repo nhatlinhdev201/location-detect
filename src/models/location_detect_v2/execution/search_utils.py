@@ -21,7 +21,7 @@ def trim_whitespace(text):
 
 def calculate_score(user_input, keys):
     input = preprocess_input(user_input)
-    
+    print(user_input)
     score = {
         'ward': 0,
         'district': 0,

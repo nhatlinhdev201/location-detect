@@ -78,6 +78,7 @@ def format_address(address):
 
 # chuyen ve dong bo tieng viet khong dau
 def nomalize_vn(text):
+    
     text = text.lower()
     text = remove_accents(text)
     return text
