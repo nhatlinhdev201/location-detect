@@ -349,7 +349,7 @@ async def process_location(user_input, collection_data):
     cache_key = f"location:{formatted_input}"
 
     if cache_key in lru_cache:
-        return {'data': lru_cache[cache_key]}
+        return lru_cache[cache_key]
 
     if not user_input:
         return {'data': {'error': "Input không hợp lệ", 'address': user_input}}
