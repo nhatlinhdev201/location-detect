@@ -244,13 +244,13 @@ async def search_address(q: str = Query(..., min_length=1)):
     results = []
     async for document in cursor:
         document["_id"] = str(document["_id"]) 
+        document["text"] = document["address"]
+        document["value"] = document["address"]
         document["address"] = document["street_name"]
         document["city_score"] = 1
         document["ward_score"] = 1
         document["district_score"] = 1
         document["score"] = 3
-        document["text"] = document["address"]
-        document["value"] = document["address"]
         results.append(document)  
     return results
 
