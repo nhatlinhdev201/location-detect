@@ -298,8 +298,11 @@ async def find_best(formatted_input, data, user_input):
             highest_score = total_score
             best_match = {
                 'city_name': entry['city_name'],
+                'city_id': entry['city_id'],
                 'district_name': entry['district_name'],
+                'district_id': entry['district_id'],
                 'ward_name': entry['ward_name'],
+                'ward_id': entry['ward_id'],
                 'score': total_score,
                 'ward_score': score['ward'],
                 'district_score': score['district'],
