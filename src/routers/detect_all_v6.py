@@ -42,3 +42,5 @@ async def analyze_multiple_locations(request: AddressRequest):
     ]
 
     return indexed_results
+
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker your_module:app

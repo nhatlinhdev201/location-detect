@@ -17,7 +17,8 @@ from src.entities.main import AddressRequest
 
 load_dotenv()
 COLLECTION_35 = os.getenv('COLLECTION_35')
-max_workers = int(os.getenv('MAX_WORKER')) 
+API_DATA = os.getenv('API_DATA')
+MAX_WORKER = int(os.getenv('MAX_WORKER')) 
 
 router = APIRouter()
 
@@ -98,7 +99,7 @@ def process_api_data(data_list):
 @router.get("/sync-data-mongodb")
 async def call_api_mongodb(): 
     # url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
-    url = "http://api-v4-erp.chuyenphatnhanh.vn/api/ApiMain/API_spCallServer"
+    url = API_DATA
     headers = {"Content-Type": "application/json"}
     payload = {
         "Json": "",
@@ -142,6 +143,22 @@ async def call_api_mongodb():
 # end database
 
 # Xử lý input
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Biến chuẩn hóa
 replacements = [
@@ -347,23 +364,50 @@ async def process_location(user_input, collection_data):
         best_match = await find_best(formatted_input, collection_data, user_input)
         result = {'data': best_match if best_match else "Không tìm thấy kết quả"}
 
-        # # Ghi vào cache nếu có kết quả phù hợp
-        # if best_match and (best_match['score'] == 3 or (best_match['ward_score'] == 1 and best_match['city_score'] == 1)):
-        #     lru_cache[cache_key] = result
-
         return result
         
 
+# Main function xử lý nhiều địa chỉ cùng lúc với ProcessPoolExecutor và asyncio
+async def process_location(user_input, collection_data):
+    if not user_input:
+        return {'data': {'error': "Input không hợp lệ", 'address': user_input}}
+
+    if contains_phone_number(user_input):
+        return {'data': {'error': "Vui lòng không để số điện thoại trong vị trí !", 'address': user_input}}
+
+    # Tìm kiếm kết quả tốt nhất
+    best_match = await find_best(user_input, collection_data, user_input)
+    result = {'data': best_match if best_match else "Không tìm thấy kết quả"}
+
+    return result
+
+# Đồng bộ hóa xử lý
 def process_location_sync(user_input, collection_data):
     return asyncio.run(process_location(user_input, collection_data))
 
+async def process_location(user_input, collection_data):
+    if not user_input:
+        return {'data': {'error': "Input không hợp lệ", 'address': user_input}}
+
+    if contains_phone_number(user_input):
+        return {'data': {'error': "Vui lòng không để số điện thoại trong vị trí !", 'address': user_input}}
+
+    # Tìm kiếm kết quả tốt nhất
+    best_match = await find_best(user_input, collection_data, user_input)
+    result = {'data': best_match if best_match else "Không tìm thấy kết quả"}
+
+    return result
+
+# Main function xử lý nhiều địa chỉ cùng lúc với ProcessPoolExecutor và asyncio
 @router.post('/locations')
 async def analyze_multiple_locations(request: AddressRequest):
     if not request.locations:
         raise HTTPException(status_code=400, detail="Input không hợp lệ")
+    
     collection = await mongo_db.get_collection(COLLECTION_35)
 
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    # Sử dụng ProcessPoolExecutor để xử lý đồng thời nhiều địa chỉ
+    with ProcessPoolExecutor(max_workers=MAX_WORKER) as executor:
         loop = asyncio.get_event_loop()
         futures = [
             loop.run_in_executor(executor, process_location_sync, user_input, await get_data_from_collection(user_input, collection))
