@@ -411,7 +411,7 @@ async def process_location(user_input, collection_data):
 
     if tmp_result['score'] == 3:
         await redis_client.set(cache_key, str(result['data']))
-        # await redis_client.ltrim('cache_list', 0, CACHE_MAX_SIZE - 1)
+        await redis_client.ltrim('cache_list', 0, CACHE_MAX_SIZE - 1)
 
     # print(f"cached_result is falsy: {result['data']}")
     # Lưu kết quả vào cache
