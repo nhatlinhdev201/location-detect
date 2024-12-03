@@ -8,4 +8,6 @@ motor
 python-dotenv
 httpx
 cachetools
+aioredis==2.0.0          # Thư viện Redis bất đồng bộ
+redis==5.0.0             # Thư viện Redis chính thức cho Python
 #pip install -r requirements.txt
